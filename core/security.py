@@ -1,0 +1,148 @@
+import uuid
+from datetime import timedelta, datetime, timezone
+from typing import Any
+
+from fastapi import Depends, HTTPException
+import jwt
+from jwt import InvalidTokenError
+from pwdlib import PasswordHash
+from pydantic import EmailStr
+from sqlalchemy import select
+from sqlalchemy.orm import Session
+
+from core.config import oauth2_schema, settings
+from models.session import get_session
+from models.user import User
+
+password_hash = PasswordHash.recommended()
+
+
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    """Compara a senha enviada com a senha hasheada.
+
+    Args:
+        plain_password (str): senha não hasheada enviado pelo usuário.
+        hashed_password (str): senha hasheada no BD.
+
+    Returns:
+        bool: Retorna True ou False..
+    """
+    return password_hash.verify(plain_password, hashed_password)
+
+
+def get_password_hash(password: str) -> str:
+    """Pega a senha enviada pelo usuário, hasheia e retorna o hash da senha.
+
+    Args:
+        password (str): senha enviada pelo usuário.
+
+    Returns:
+        str: senha hasheada.
+    """
+    return password_hash.hash(password)
+
+
+ALGORITHM = "HS256"
+
+DUMMY_HASH = "$argon2i$v=19$m=16,t=2,p=1$Uzd6Ym82c25XcW1iVkZNdQ$QMAWuZp748LzlKi+9Umv9w"
+
+
+def create_access_token(
+    subject: str | Any,
+    expires_delta: timedelta = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES),
+) -> str:
+    """Pega o ID do usuário e a configuração padrão de tempo de token e retorna um token JWT codificado.
+
+    Args:
+        subject (str): ID do usuário.
+        expires_delta (timedelta): validade do token.
+
+    Returns:
+        str: jwt token codificado.
+    """
+    expire = datetime.now(timezone.utc) + expires_delta
+    to_encode = {"sub": str(subject), "exp": expire}
+    return jwt.encode(to_encode, settings.SECRET_KEY, algorithm=ALGORITHM)
+
+
+def verify_access_token(
+    token: str = Depends(oauth2_schema), session: Session = Depends(get_session)
+) -> User:
+    """Pega o token, decodifica e analisa.
+
+    Args:
+        token (str): token JWT.
+        session (Session): sessão do banco de dados.
+
+    Returns:
+        User: retorna o usuário.
+
+    Raises:
+        HTTPException 401: se o token for inválido ou o usuário não existir.
+    """
+    try:
+        dict_info = jwt.decode(token, settings.SECRET_KEY, algorithms=[ALGORITHM])
+        id_user = uuid.UUID(dict_info["sub"])
+    except InvalidTokenError:
+        raise HTTPException(status_code=401, detail="Acesso negado!")
+    user = session.query(User).filter(User.id == id_user).first()
+    if not user:
+        raise HTTPException(status_code=401, detail="Acesso negado!")
+    return user
+
+
+def authenticate_user(email: EmailStr, password: str, session: Session) -> User | bool:
+    """Verifica se o email e a senha estão corretos.
+
+    Args:
+        email (EmailStr): email do usuário.
+        password (str): senha do usuário.
+        session (Session): sessão do banco de dados.
+
+    Returns:
+        bool: retorna False caso o usuário não exista ou a senha esteja errada.
+        User: retorna o usuário caso seja bem sucedida as verificações.
+    """
+    user = session.execute(select(User).where(User.email == email)).scalar_one_or_none()
+    if not user:
+        verify_password(password, DUMMY_HASH)
+        return False
+    elif not verify_password(password, user.password):
+        return False
+    return user
+
+
+def generate_password_reset_token(email: str) -> str:
+    """Gera um token JWT para recuperação de senha.
+
+    Args:
+        email (str): email da conta a ter a senha recuperada.
+
+    Returns:
+        str: retorna token JWT codificado.
+    """
+    delta = timedelta(hours=settings.EMAIL_RESET_TOKEN_EXPIRE_HOURS)
+    now = datetime.now(timezone.utc)
+    expires = now + delta
+    exp = expires.timestamp()
+    encoded_jwt = jwt.encode(
+        {"exp": exp, "nbf": now, "sub": email}, settings.SECRET_KEY, algorithm=ALGORITHM
+    )
+    return encoded_jwt
+
+
+def verify_password_reset_token(token: str) -> str | None:
+    """Pega o token e decodifica.
+
+    Args:
+        token (str): token JWT a ser verificado.
+
+    Returns:
+        str: caso o token esteja correto retorna o email do usuário.
+        None: caso o token esteja invalido ou expirado retorna None.
+    """
+    try:
+        decoded_token = jwt.decode(token, settings.SECRET_KEY, algorithms=[ALGORITHM])
+        return str(decoded_token["sub"])
+    except InvalidTokenError:
+        return None
