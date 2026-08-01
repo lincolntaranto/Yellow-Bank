@@ -10,6 +10,7 @@ def create_user(*, session: Session, user_create_schema: UserCreateSchema) -> Us
     new_user = User(
         name=user_create_schema.name,
         password=password_hash,
+        cpf=user_create_schema.cpf,
         email=user_create_schema.email,
     )
     session.add(new_user)
