@@ -11,8 +11,8 @@ from models.base import Base
 from models.session import get_session
 from unittest.mock import patch
 
-USER_DATA = {"name": "Teste", "email": "pyteste@email.com", "password": "123"}
-USER_DATA_WRONG = {"name": "Teste2", "email": "pytesteemail.com", "password": "123"}
+USER_DATA = {"name": "Teste", "email": "pyteste@email.com", "password": "123", "cpf": "798.166.440-37"}
+USER_DATA_WRONG = {"name": "Teste2", "email": "pytesteemail.com", "password": "123", "cpf": "798.166.440-37"}
 
 
 @pytest.fixture(scope="session")
