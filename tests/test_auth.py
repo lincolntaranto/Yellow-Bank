@@ -26,6 +26,12 @@ def test_create_user_wrong_format_email(client):
     assert response.status_code == 422
 
 
+def test_create_user_duplicate_cpf(client):
+    client.post("/auth/user", json=USER_DATA)
+    response = client.post("/auth/user", json=USER_DATA)
+    assert response.status_code == 409
+
+
 def test_login_success(client):
     client.post("/auth/user", json=USER_DATA)
     response = client.post(
