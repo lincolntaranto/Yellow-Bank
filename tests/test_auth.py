@@ -9,7 +9,15 @@ def test_create_user(client):
 
 def test_create_user_duplicate_email(client):
     client.post("/auth/user", json=USER_DATA)
-    response = client.post("/auth/user", json=USER_DATA)
+    response = client.post(
+        "/auth/user",
+        json={
+            "name": "Teste",
+            "email": "pyteste@email.com",
+            "password": "123",
+            "cpf": "983.154.700-43",
+        },
+    )
     assert response.status_code == 400
 
 
