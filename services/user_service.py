@@ -27,6 +27,13 @@ def get_user_by_email(*, session: Session, email: str) -> User | None:
     return session_user
 
 
+def get_user_by_cpf(*, session: Session, cpf: str) -> User | None:
+    session_user = session.execute(
+        select(User).where(User.cpf == cpf)
+    ).scalar_one_or_none()
+    return session_user
+
+
 def change_password(
     *, session: Session, user_update_password: UserUpdatePasswordSchema, user: User
 ) -> User:
