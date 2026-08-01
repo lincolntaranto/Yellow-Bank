@@ -6,6 +6,7 @@ from pydantic import BaseModel, EmailStr, ConfigDict
 class UserCreateSchema(BaseModel):
     name: str
     password: str
+    cpf: str
     email: EmailStr
 
 
