@@ -1,6 +1,6 @@
 import uuid
 
-from sqlalchemy import String, Text, UUID
+from sqlalchemy import String, Text, UUID, Numeric
 from sqlalchemy.orm import Mapped, mapped_column
 
 from .base import Base
@@ -13,6 +13,8 @@ class User(Base):
         UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
     )
     name: Mapped[str] = mapped_column(String(100))
+    cpf: Mapped[str] = mapped_column(String(20), unique=True)
     password: Mapped[str] = mapped_column(Text)
     email: Mapped[str] = mapped_column(Text, unique=True)
+    saldo: Mapped[float] = mapped_column(Numeric(10, 2),default=0)
     admin: Mapped[bool] = mapped_column(default=False)
