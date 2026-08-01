@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Request, BackgroundTasks
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
+from validate_docbr import CPF
 
 from services import auth
 from core.email.utils import (
@@ -16,7 +17,7 @@ from core.security import (
     generate_password_reset_token,
     verify_password_reset_token,
 )
-from services.user_service import get_user_by_email
+from services.user_service import get_user_by_email, get_user_by_cpf
 from core.limiter import limiter
 from models.session import get_session
 from schemas.login import LoginSchema
@@ -34,6 +35,13 @@ def create_user(
     session: Session = Depends(get_session),
 ):
     """Criar um usuário"""
+    cpf = CPF()
+    cpftest = cpf.validate(user_create_schema.cpf)
+    if not cpftest:
+        raise HTTPException(status_code=422, detail="CPF inválido!")
+    user = get_user_by_cpf(session=session, cpf=user_create_schema.cpf)
+    if user:
+        raise HTTPException(status_code=409, detail="CPF já cadastrado!")
     user = get_user_by_email(session=session, email=user_create_schema.email)
     if user:
         raise HTTPException(status_code=400, detail="email já cadastrado!")
