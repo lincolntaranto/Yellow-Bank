@@ -1,15 +1,12 @@
-![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/lincolntaranto/template-api/ci.yml?label=CI%20/%20Tests&style=flat-square)
-[![Dependabot](https://img.shields.io/badge/dependabot-active-brightgreen?style=flat-square&logo=dependabot)](https://github.com/lincolntaranto/template-api/blob/main/.github/dependabot.yml)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/lincolntaranto/Yellow-Bank/ci.yml?label=CI%20/%20Tests&style=flat-square)
 [![Python Version](https://img.shields.io/badge/python-3.14-blue?style=flat-square&logo=python)](https://www.python.org/)
 [![Framework: FastAPI](https://img.shields.io/badge/framework-FastAPI-009688?style=flat-square&logo=fastapi)](https://fastapi.tiangolo.com/)
 [![Linter: Ruff](https://img.shields.io/badge/linter-ruff-black?style=flat-square&logo=ruff)](https://github.com/astral-sh/ruff)
-[![Deploy](https://img.shields.io/badge/deploy-render-purple)]()
-[![Status](https://img.shields.io/badge/status-online-success)](https://template-api-89m8.onrender.com/docs)
 [![Email: Resend](https://img.shields.io/badge/email-Resend-000000?style=flat-square&logo=resend)](https://resend.com/)
 
-# FastAPI Template
+# Yellow-Bank
 
-Template base para criação de APIs REST.
+API voltado para sistemas bancários.
 
 ---
 
