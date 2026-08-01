@@ -18,7 +18,7 @@ def test_create_user_duplicate_email(client):
             "cpf": "983.154.700-43",
         },
     )
-    assert response.status_code == 400
+    assert response.status_code == 409
 
 
 def test_create_user_wrong_format_email(client):

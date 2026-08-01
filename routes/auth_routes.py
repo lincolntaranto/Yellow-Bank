@@ -44,7 +44,7 @@ def create_user(
         raise HTTPException(status_code=409, detail="CPF já cadastrado!")
     user = get_user_by_email(session=session, email=user_create_schema.email)
     if user:
-        raise HTTPException(status_code=400, detail="email já cadastrado!")
+        raise HTTPException(status_code=409, detail="email já cadastrado!")
     new_user = auth.create_user(session=session, user_create_schema=user_create_schema)
     email_data = generate_new_account_email(email_to=new_user.email)
     background_tasks.add_task(
