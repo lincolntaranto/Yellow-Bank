@@ -6,7 +6,7 @@
 
 # Yellow-Bank
 
-API voltado para sistemas bancários.
+API voltada para sistemas bancários.
 
 ---
 
@@ -42,6 +42,7 @@ template-api/
 ├── models/
 │   ├── base.py           # Engine e Base do SQLAlchemy
 │   ├── session.py        # Sessão do banco
+│   ├── transaction.py    # Model da transação
 │   └── user.py           # Model de usuário
 ├── routes/
 │   ├── auth_routes.py    # Rotas de autenticação
