@@ -1,4 +1,5 @@
 import uuid
+from decimal import Decimal
 
 from sqlalchemy import String, Text, UUID, Numeric
 from sqlalchemy.orm import Mapped, mapped_column
@@ -16,5 +17,5 @@ class User(Base):
     cpf: Mapped[str] = mapped_column(String(20), unique=True)
     password: Mapped[str] = mapped_column(Text)
     email: Mapped[str] = mapped_column(Text, unique=True)
-    saldo: Mapped[float] = mapped_column(Numeric(10, 2),default=0)
+    saldo: Mapped[Decimal] = mapped_column(Numeric(10, 2), default=0)
     admin: Mapped[bool] = mapped_column(default=False)
